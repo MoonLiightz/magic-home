@@ -1,0 +1,84 @@
+project_name: magic-home
+
+release:
+  github:
+    owner: moonliightz
+    name: magic-home
+
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://goproxy.io
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  -
+    main: ./cmd/main.go
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - freebsd
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+    ignore:
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
+
+archives:
+  -
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+# # This is an example goreleaser.yaml file with some sane defaults.
+# # Make sure to check the documentation at http://goreleaser.com
+# before:
+#   hooks:
+#     # You may remove this if you don't use go modules.
+#     - go mod download
+#     # you may remove this if you don't need go generate
+#     - go generate ./...
+# builds:
+# - env:
+#   - CGO_ENABLED=0
+# archives:
+# - replacements:
+#     darwin: Darwin
+#     linux: Linux
+#     windows: Windows
+#     386: i386
+#     amd64: x86_64
+# checksum:
+#   name_template: 'checksums.txt'
+# snapshot:
+#   name_template: "{{ .Tag }}-next"
+# changelog:
+#   sort: asc
+#   filters:
+#     exclude:
+#     - '^docs:'
+#     - '^test:'
