@@ -48,12 +48,12 @@ GLOBAL OPTIONS:
 $ ./magic-home discover
 ```
 
-- Turn LED Stripe Controller on
+- Turn LED Strip Controller on
 ```bash
 $ ./magic-home state 192.168.1.42 on
 ```
 
-- Turn LED Stripe Controller off
+- Turn LED Strip Controller off
 ```bash
 $ ./magic-home state 192.168.1.42 off
 ```
