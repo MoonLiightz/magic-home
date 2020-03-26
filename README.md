@@ -17,7 +17,7 @@ This repository offers the possibility to control Magic Home (Magic Hue) LED Str
 Choose the archive matching the destination platform and extract it.
 
 ```bash
-$ wget -qO- https://github.com/moonliightz/magic-home/releases/download/v1.0.0/magic-home_1.0.0_linux_x86_64.tar.gz | tar -zxvf - magic-home
+$ wget -qO- https://github.com/moonliightz/magic-home/releases/download/v1.1.0/magic-home_1.1.0_linux_x86_64.tar.gz | tar -zxvf - magic-home
 ```
 
 > Binaries are available on the GitHub [releases](https://github.com/moonliightz/magic-home/releases) page.
