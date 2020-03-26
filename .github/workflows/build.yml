@@ -70,6 +70,8 @@ jobs:
             dist/checksums.txt
             dist/*.tar.gz
             dist/*.zip
+            dist/*.deb
+            dist/*.rpm
           name: ${{ steps.prepare.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

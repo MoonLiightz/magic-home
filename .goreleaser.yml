@@ -54,31 +54,53 @@ archives:
 checksum:
   name_template: 'checksums.txt'
 
-# # This is an example goreleaser.yaml file with some sane defaults.
-# # Make sure to check the documentation at http://goreleaser.com
-# before:
-#   hooks:
-#     # You may remove this if you don't use go modules.
-#     - go mod download
-#     # you may remove this if you don't need go generate
-#     - go generate ./...
-# builds:
-# - env:
-#   - CGO_ENABLED=0
-# archives:
-# - replacements:
-#     darwin: Darwin
-#     linux: Linux
-#     windows: Windows
-#     386: i386
-#     amd64: x86_64
-# checksum:
-#   name_template: 'checksums.txt'
-# snapshot:
-#   name_template: "{{ .Tag }}-next"
-# changelog:
-#   sort: asc
-#   filters:
-#     exclude:
-#     - '^docs:'
-#     - '^test:'
+nfpms:
+  -
+    # You can change the name of the package.
+    # This is parsed with the Go template engine and the following variables
+    # are available:
+    # - ProjectName
+    # - Tag
+    # - Version (Git tag without `v` prefix)
+    # - Os
+    # - Arch
+    # - Arm (ARM version)
+    # - Env (environment variables)
+    # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+    # Your app's vendor.
+    # Default is empty.
+    vendor: Patrick Stebbe
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: https://github.com/MoonLiightz/magic-home
+
+    # Your app's maintainer (probably you).
+    # Default is empty.
+    maintainer: Patrick Stebbe <info@moonliightz.de>
+
+    # Your app's description.
+    # Default is empty.
+    description: A CLI and library written in Go for controlling Magic Home (Magic Hue) LED Strip Controllers.
+
+    # Your app's license.
+    # Default is empty.
+    license: MIT
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+
+    # Replacements for GOOS and GOARCH in the package name.
+    # Keys should be valid GOOSs or GOARCHs.
+    # Values are the respective replacements.
+    # Default is empty.
+    replacements:
+      386: i386
+      arm: armhf
+
+  # Override default /usr/local/bin destination for binaries
+  # bindir: /usr/bin
