@@ -34,13 +34,18 @@ USAGE:
    magic-home [global options] command [command options] [arguments...]
 
 COMMANDS:
-   color, c  Set the color of the LED Strip
-   state, s  Switch the LED Strip state to on or off
-   help, h   Shows a list of commands or help for one command
+   color, c     Set the color of the LED Strip
+   state, s     Switch the LED Strip state to on or off
+   discover, d  Discover for Magic Home devices on the network
+   help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --help, -h  show help (default: false)
+```
 
+- Discover devices
+```bash
+$ ./magic-home discover
 ```
 
 - Turn LED Stripe Controller on
