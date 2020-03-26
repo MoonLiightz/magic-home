@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/moonliightz/magic-home/internal/util"
 	magichome "github.com/moonliightz/magic-home/pkg"
@@ -11,8 +12,9 @@ import (
 )
 
 type command struct {
-	Color *cli.Command
-	State *cli.Command
+	Color    *cli.Command
+	State    *cli.Command
+	Discover *cli.Command
 }
 
 // Command are the commands for the CLI
@@ -94,6 +96,46 @@ var Command = command{
 			} else {
 				fmt.Println("Invalid IP: ", ipArg)
 				cli.ShowCommandHelpAndExit(c, "state", 1)
+			}
+
+			return nil
+		},
+	},
+	Discover: &cli.Command{
+		Name:      "discover",
+		Aliases:   []string{"d"},
+		Usage:     "Discover for Magic Home devices on the network",
+		ArgsUsage: "",
+		Flags:     []cli.Flag{Flag.BroadcastAddr, Flag.Timeout},
+		Action: func(c *cli.Context) error {
+			fmt.Print("Discovering")
+			go func() {
+				for {
+					fmt.Print(".")
+					time.Sleep(100 * time.Millisecond)
+				}
+			}()
+
+			devices, err := magichome.Discover(magichome.DiscoverOptions{
+				BroadcastAddr: c.String("broadcastaddr"),
+				Timeout:       uint8(c.Int("timeout")),
+			})
+			if err != nil {
+				return err
+			}
+
+			if len(*devices) >= 1 {
+				fmt.Println()
+				fmt.Println("Discovered the following devices:")
+				fmt.Println()
+				fmt.Println("Address    \t| ID         \t| Model")
+				fmt.Println("---------------------------------------")
+				for _, device := range *devices {
+					fmt.Printf("%s\t| %s\t| %s\n", device.IP, device.ID, device.Model)
+				}
+			} else {
+				fmt.Println()
+				fmt.Println("No devices discovered.")
 			}
 
 			return nil

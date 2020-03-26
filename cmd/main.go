@@ -15,6 +15,7 @@ func main() {
 		Commands: []*cli.Command{
 			appcli.Command.Color,
 			appcli.Command.State,
+			appcli.Command.Discover,
 		},
 	}
 
