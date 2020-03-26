@@ -98,7 +98,8 @@ controller.SetColor(magichome.Color{
 // Don't forget to close the connection to the LED Strip Controller
 controller.Close()
 ```
-For a full ready-to-use example take a look at [examples/complete.go](examples/complete.go).
+For a ready-to-use example take a look at [examples/basic/main.go](examples/basic/main.go).
+
 
 ## License
 
