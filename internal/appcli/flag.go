@@ -6,6 +6,7 @@ type flag struct {
 	Port          *cli.IntFlag
 	BroadcastAddr *cli.StringFlag
 	Timeout       *cli.IntFlag
+	JSON          *cli.BoolFlag
 }
 
 // Flag contains the options for the CLI
@@ -32,6 +33,14 @@ var Flag = flag{
 		Usage:       "discover search timeout",
 		DefaultText: "1 second",
 		Value:       1,
+		Required:    false,
+	},
+	JSON: &cli.BoolFlag{
+		Name:        "json",
+		Aliases:     []string{},
+		Usage:       "return output as a JSON-String",
+		DefaultText: "false",
+		Value:       false,
 		Required:    false,
 	},
 }

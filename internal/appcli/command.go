@@ -1,6 +1,7 @@
 package appcli
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -14,6 +15,7 @@ import (
 type command struct {
 	Color    *cli.Command
 	State    *cli.Command
+	Status   *cli.Command
 	Discover *cli.Command
 }
 
@@ -96,6 +98,54 @@ var Command = command{
 			} else {
 				fmt.Println("Invalid IP: ", ipArg)
 				cli.ShowCommandHelpAndExit(c, "state", 1)
+			}
+
+			return nil
+		},
+	},
+	Status: &cli.Command{
+		Name:      "status",
+		Aliases:   []string{},
+		Usage:     "Prints the status of the LED Strip",
+		ArgsUsage: "<ip>",
+		Flags:     []cli.Flag{Flag.Port, Flag.JSON},
+		Action: func(c *cli.Context) error {
+			ipArg := c.Args().Get(0)
+			if ip := net.ParseIP(ipArg); ip != nil {
+				controller, err := magichome.New(ip, uint16(c.Int("port")))
+				if err != nil {
+					return err
+				}
+
+				var deviceState *magichome.DeviceState
+				deviceState, err = controller.GetDeviceState()
+				if err != nil {
+					return err
+				}
+
+				if c.Bool("json") {
+					res, err := json.Marshal(deviceState)
+					if err != nil {
+						return err
+					}
+					fmt.Println(string(res))
+				} else {
+					fmt.Printf("Device is: ")
+					if deviceState.State == magichome.On {
+						fmt.Println("On")
+					} else {
+						fmt.Println("Off")
+					}
+					fmt.Printf("Color: \tR: %d \n\tG: %d \n\tB: %d \n\tW: %d\n", deviceState.Color.R, deviceState.Color.G, deviceState.Color.B, deviceState.Color.W)
+				}
+
+				err = controller.Close()
+				if err != nil {
+					return err
+				}
+			} else {
+				fmt.Println("Invalid IP: ", ipArg)
+				cli.ShowCommandHelpAndExit(c, "status", 1)
 			}
 
 			return nil

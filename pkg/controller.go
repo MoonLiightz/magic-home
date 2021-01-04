@@ -22,6 +22,7 @@ func New(ip net.IP, port uint16) (*Controller, error) {
 			on:    []byte{0x71, 0x23, 0x94},
 			off:   []byte{0x71, 0x24, 0x95},
 			color: []byte{0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			state: []byte{0x81, 0x8a, 0x8b, 0x96},
 		},
 	}
 
@@ -67,6 +68,39 @@ func (c *Controller) SetColor(color Color) error {
 	}
 
 	return nil
+}
+
+// GetDeviceState can be used to get information about the state of the LED Strip
+func (c *Controller) GetDeviceState() (*DeviceState, error) {
+
+	_, err := c.conn.Write(c.command.state)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]byte, 14)
+	_, err = c.conn.Read(response)
+	if err != nil {
+		return nil, err
+	}
+
+	deviceState := DeviceState{}
+	deviceState.DeviceType = response[1]
+	deviceState.Mode = response[3]
+	deviceState.Slowness = response[5]
+	deviceState.Color.R = response[6]
+	deviceState.Color.G = response[7]
+	deviceState.Color.B = response[8]
+	deviceState.Color.W = response[9]
+	deviceState.LedVersionNumber = response[10]
+
+	if response[2] == 0x23 {
+		deviceState.State = On
+	} else {
+		deviceState.State = Off
+	}
+
+	return &deviceState, nil
 }
 
 // Close closes the tcp connection to the LED Strip

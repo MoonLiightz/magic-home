@@ -7,6 +7,7 @@ This repository offers the possibility to control Magic Home (Magic Hue) LED Str
 
 - Change the state of the LED Strip Controller to on or off
 - Change the color of the LED Strip Controller with RGBW
+- Request the current state ot the LED Strip Controller
 - Provides a simple ready-to-use CLI
 - Can be used as a library to control the controller in your own applications
 
@@ -36,6 +37,7 @@ USAGE:
 COMMANDS:
    color, c     Set the color of the LED Strip
    state, s     Switch the LED Strip state to on or off
+   status       Prints the status of the LED Strip
    discover, d  Discover for Magic Home devices on the network
    help, h      Shows a list of commands or help for one command
 
@@ -66,6 +68,14 @@ $ ./magic-home color 192.168.1.42 255 0 0 0
 - Switch Color to cyan with 100% brightness
 ```bash
 $ ./magic-home color 192.168.1.42 0 255 255 0
+```
+
+- Request the status of a device
+```bash
+$ ./magic-home status 192.168.1.42
+
+# You can also get the response as JSON
+$ ./magic-home status --json 192.168.1.42
 ```
 
 > Change `192.168.1.42` to the IP of your Controller.  
@@ -100,10 +110,27 @@ controller.SetColor(magichome.Color{
   W: 0,
 })
 
+// Get the current state of the device
+// The response looks like
+// {
+//   "DeviceType": 51,
+//   "State": 1,
+//   "LedVersionNumber": 6,
+//   "Mode": 97,
+//   "Slowness": 15,
+//   "Color": {
+//     "R": 21,
+//     "G": 77,
+//     "B": 70,
+//     "W": 0
+//   }
+// }
+deviceState, _ := controller.GetDeviceState()
+
 // Don't forget to close the connection to the LED Strip Controller
 controller.Close()
 ```
-For a ready-to-use example take a look at [examples/basic/main.go](examples/basic/main.go).
+For a ready-to-use example take a look at [examples/basic/main.go](examples/basic/main.go) or generally in the [examples](examples/) folder.
 
 
 ## License
