@@ -5,28 +5,48 @@ import (
 	"net"
 )
 
-// Controller represents a Magic Home LED Strip Controller
-type Controller struct {
-	ip      net.IP
-	port    uint16
-	conn    net.Conn
-	command command
+// Options holds Magic Home device controller object options
+type Options struct {
+	ApplyMasks       bool   // Enables a special bitmask which is required for some devices of type 0x25, 0x35 or 0x44 (default: false)
+	ColdWhiteSupport bool   // Enables support for setting cold white values (default: false)
+	LogReceived      bool   // Enables logging of received bytes (default: false)
+	LogSending       bool   // Enables logging of sending bytes (default: false)
+	Port             uint16 // Port of the Magic Home device (default: 5577)
+	ReadTimeout      uint32 // Time in seconds to wait for a response (default: 1)
+	WriteTimeout     uint32 // Time in seconds to try to send the bytes (default: 1)
 }
 
-// New initializes a new Magic Home LED Strip Controller
-func New(ip net.IP, port uint16) (*Controller, error) {
-	mh := Controller{
-		ip:   ip,
-		port: port,
-		command: command{
-			on:    []byte{0x71, 0x23, 0x94},
-			off:   []byte{0x71, 0x24, 0x95},
-			color: []byte{0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			state: []byte{0x81, 0x8a, 0x8b, 0x96},
-		},
+// Controller represents a Magic Home device
+type Controller struct {
+	ip          net.IP
+	conn        net.Conn
+	options     Options
+	DeviceState DeviceState
+}
+
+// New initializes a new Magic Home device controller
+func New(ip net.IP, options Options) (*Controller, error) {
+	// check options
+	if options.Port <= 0 {
+		// default port
+		options.Port = 5577
+	}
+	if options.WriteTimeout <= 0 {
+		// default one second
+		options.WriteTimeout = 1
+	}
+	if options.ReadTimeout <= 0 {
+		// default one second
+		options.ReadTimeout = 1
 	}
 
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", mh.ip, mh.port))
+	mh := Controller{
+		ip:          ip,
+		options:     options,
+		DeviceState: DeviceState{},
+	}
+
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", mh.ip, mh.options.Port))
 	if err != nil {
 		return nil, err
 	}
@@ -36,11 +56,7 @@ func New(ip net.IP, port uint16) (*Controller, error) {
 	return &mh, nil
 }
 
-// SetState can be used to switch the LED Strip on (magichome.On) or off (magichome.Off)
-func (c *Controller) SetState(s State) error {
-	if s == On {
-		_, err := c.conn.Write(c.command.on)
-		return err
+		sum += uint(value)
 	}
 	_, err := c.conn.Write(c.command.off)
 	return err
