@@ -3,6 +3,7 @@ package magichome
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 // Options holds Magic Home device controller object options
@@ -27,7 +28,7 @@ type Controller struct {
 // New initializes a new Magic Home device controller
 func New(ip net.IP, options Options) (*Controller, error) {
 	// check options
-	if options.Port <= 0 {
+	if options.Port < 1 || options.Port > 65535 {
 		// default port
 		options.Port = 5577
 	}
@@ -56,67 +57,44 @@ func New(ip net.IP, options Options) (*Controller, error) {
 	return &mh, nil
 }
 
+func (c *Controller) sendCommand(buffer []uint8) ([]uint8, error) {
+	// calc checksum
+	var sum uint = 0
+	for _, value := range buffer {
 		sum += uint(value)
 	}
-	_, err := c.conn.Write(c.command.off)
-	return err
-}
+	buffer = append(buffer, byte(sum&0xff))
 
-// SetColor can be used to change the color of the LED Strip
-func (c *Controller) SetColor(color Color) error {
-	bytesToSend := c.command.color
-
-	bytesToSend[1] = byte(color.R)
-	bytesToSend[2] = byte(color.G)
-	bytesToSend[3] = byte(color.B)
-	bytesToSend[4] = byte(color.W)
-
-	var sum int
-	for _, value := range bytesToSend {
-		sum += int(value)
+	if c.options.LogSending {
+		fmt.Printf("Sending bytes:  ")
+		for _, b := range buffer {
+			fmt.Printf("0x%.2x ", b)
+		}
+		fmt.Println()
 	}
 
-	bytesToSend = append(bytesToSend, byte(sum&0xff))
-
-	_, err := c.conn.Write(bytesToSend)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GetDeviceState can be used to get information about the state of the LED Strip
-func (c *Controller) GetDeviceState() (*DeviceState, error) {
-
-	_, err := c.conn.Write(c.command.state)
+	c.conn.SetDeadline(time.Now().Add(time.Duration(c.options.WriteTimeout) * time.Second))
+	_, err := c.conn.Write(buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	response := make([]byte, 14)
-	_, err = c.conn.Read(response)
-	if err != nil {
-		return nil, err
+	resBuffer := make([]byte, 1024)
+	c.conn.SetReadDeadline(time.Now().Add(time.Duration(c.options.ReadTimeout) * time.Second))
+	c.conn.Read(resBuffer)
+
+	if c.options.LogReceived {
+		fmt.Printf("Received bytes: ")
+		for _, b := range resBuffer {
+			if b == 0 {
+				continue
+			}
+			fmt.Printf("0x%.2x ", b)
+		}
+		fmt.Println()
 	}
 
-	deviceState := DeviceState{}
-	deviceState.DeviceType = response[1]
-	deviceState.Mode = response[3]
-	deviceState.Slowness = response[5]
-	deviceState.Color.R = response[6]
-	deviceState.Color.G = response[7]
-	deviceState.Color.B = response[8]
-	deviceState.Color.W = response[9]
-	deviceState.LedVersionNumber = response[10]
-
-	if response[2] == 0x23 {
-		deviceState.State = On
-	} else {
-		deviceState.State = Off
-	}
-
-	return &deviceState, nil
+	return resBuffer, nil
 }
 
 // Close closes the tcp connection to the LED Strip
