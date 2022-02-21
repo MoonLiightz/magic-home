@@ -38,12 +38,12 @@ func (c *Controller) SetState(s State) ([]uint8, error) {
 	return c.sendCommand([]uint8{0x71, 0x24, 0x0f})
 }
 
-// TunrOn turns the Magic Home device on
+// TurnOn turns the Magic Home device on
 func (c *Controller) TurnOn() ([]uint8, error) {
 	return c.SetState(On)
 }
 
-// TunrOff turns the Magic Home device off
+// TurnOff turns the Magic Home device off
 func (c *Controller) TurnOff() ([]uint8, error) {
 	return c.SetState(Off)
 }
