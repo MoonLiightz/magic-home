@@ -37,7 +37,7 @@ var Command = command{
 	ColorAndWhites: &cli.Command{
 		Name:      "colorandwhites",
 		Aliases:   []string{"cwwcw", "rgbww"},
-		Usage:     "Set the color, warm white and cold white values op the device",
+		Usage:     "Set the color, warm white and cold white values of the device",
 		ArgsUsage: "<ip> <r> <g> <b> <ww> <cw>",
 		Flags:     []cli.Flag{Flag.CWSupport, Flag.Masks, Flag.Port, Flag.Verbose},
 		Action:    colorAndWhitesAction,
