@@ -1,4 +1,3 @@
- 
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -13,3 +12,4 @@
 *.out
 
 dist/
+.idea
