@@ -37,9 +37,9 @@ func parseStateArg(c *cli.Context) magichome.State {
 	stateArg := strings.ToLower(c.Args().Get(1))
 	var status magichome.State
 
-	if stateArg == "on" {
+	if stateArg == "on" || stateArg == "true" {
 		status = magichome.On
-	} else if stateArg == "off" {
+	} else if stateArg == "off" || stateArg == "false" {
 		status = magichome.Off
 	} else {
 		fmt.Println("Invalid state: ", stateArg)
